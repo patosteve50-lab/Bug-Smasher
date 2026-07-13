@@ -275,7 +275,6 @@ function getBug(type){
 }
 function releaseBug(g){
   scene.remove(g);
-  if(g.userData.noPool || g.userData.isBoss){ return; }
   const t=g.userData.type;
   if(bugPools[t] && bugPools[t].length<40) bugPools[t].push(g);
 }
@@ -292,7 +291,7 @@ function makeBoss(key){
   const aura=new THREE.PointLight(0xff4040,1.6,14); aura.position.y=1; g.add(aura);
   g.userData.spec = Object.assign({}, BUGS[bd.base], { fly:bd.fly, aggressive:bd.aggressive, pts:bd.pts });
   g.userData.hp=bd.hp; g.userData.maxHp=bd.hp; g.userData.alive=true; g.userData.isBoss=true;
-  g.userData.bossKey=key; g.userData.spawnAcc=0; g.userData.t=0; g.userData.dying=undefined; g.userData.noPool=true;
+  g.userData.bossKey=key; g.userData.spawnAcc=0; g.userData.t=0; g.userData.dying=undefined;
   return g;
 }
 

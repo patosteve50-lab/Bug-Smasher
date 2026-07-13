@@ -76,9 +76,9 @@ const Audio = (() => {
   function init(){
     if (ctx) return;
     ctx = new (window.AudioContext||window.webkitAudioContext)();
-    master = ctx.createGain(); master.gain.value = 1.0; master.connect(ctx.destination);
-    musicGain = ctx.createGain(); musicGain.gain.value = 0.55; musicGain.connect(master);
-    sfxGain = ctx.createGain(); sfxGain.gain.value = 0.95; sfxGain.connect(master);
+    master = ctx.createGain(); master.gain.value = 0.9; master.connect(ctx.destination);
+    musicGain = ctx.createGain(); musicGain.gain.value = 0.30; musicGain.connect(master);
+    sfxGain = ctx.createGain(); sfxGain.gain.value = 0.6; sfxGain.connect(master);
   }
   function now(){ return ctx.currentTime; }
   function tone(freq, dur, type='sine', gain=0.3, dest, slide=0){
@@ -137,10 +137,9 @@ const Audio = (() => {
   }
   function setIntensity(on){ drumLayer=on; }
   function stopMusic(){ if(musicTimer){ clearInterval(musicTimer); musicTimer=null; } }
-  function setMuted(m){ muted=m; if(master) master.gain.value=m?0:1.0; }
+  function setMuted(m){ muted=m; if(master) master.gain.value=m?0:0.9; }
   function resume(){ if(ctx&&ctx.state==='suspended') ctx.resume(); }
-  function startMenuMusic(){ if(!ctx) return; stopMusic(); curScale=[0,3,7,10,12]; curRoot=36; musicStep=0; drumLayer=false; musicTimer=setInterval(()=>{ if(muted) return; const s=musicStep; if(s%8===0){ const bn=curRoot*Math.pow(2,(curScale[(s/8)%curScale.length])/12); tone(bn,1.4,'sine',0.4,musicGain,1); } if(s%4===0){ const an=curRoot*3*Math.pow(2,(curScale[s%curScale.length])/12); tone(an,0.9,'triangle',0.22,musicGain); } if(s%16===10){ const sp=curRoot*6*Math.pow(2,(curScale[s%curScale.length])/12); tone(sp,0.7,'sine',0.12,musicGain); } musicStep=(musicStep+1)%64; }, 360); }
-  return { init, sfx, startMusic, startMenuMusic, setIntensity, stopMusic, setMuted, resume, get muted(){return muted;} };
+  return { init, sfx, startMusic, setIntensity, stopMusic, setMuted, resume, get muted(){return muted;} };
 })();
 
 function haptic(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
@@ -275,7 +274,6 @@ function getBug(type){
 }
 function releaseBug(g){
   scene.remove(g);
-  if(g.userData.noPool || g.userData.isBoss){ return; }
   const t=g.userData.type;
   if(bugPools[t] && bugPools[t].length<40) bugPools[t].push(g);
 }
@@ -292,7 +290,7 @@ function makeBoss(key){
   const aura=new THREE.PointLight(0xff4040,1.6,14); aura.position.y=1; g.add(aura);
   g.userData.spec = Object.assign({}, BUGS[bd.base], { fly:bd.fly, aggressive:bd.aggressive, pts:bd.pts });
   g.userData.hp=bd.hp; g.userData.maxHp=bd.hp; g.userData.alive=true; g.userData.isBoss=true;
-  g.userData.bossKey=key; g.userData.spawnAcc=0; g.userData.t=0; g.userData.dying=undefined; g.userData.noPool=true;
+  g.userData.bossKey=key; g.userData.spawnAcc=0; g.userData.t=0; g.userData.dying=undefined;
   return g;
 }
 
@@ -320,7 +318,7 @@ function showOverlay(name){
   ['menu','levelSelect','shopScreen','missionScreen','endScreen'].forEach(o=>els[o].classList.add('hide'));
   els.hud.classList.add('hide'); els.muteBtn.classList.add('hide'); els.fps.classList.add('hide');
   if(name) els[name].classList.remove('hide');
-  if(name==='menu'){ els.menuCoins.textContent=save.coins; buildModes(); G.state='menu'; Audio.startMenuMusic(); }
+  if(name==='menu'){ els.menuCoins.textContent=save.coins; buildModes(); }
 }
 let toastT=null;
 function toast(msg, sub){
@@ -493,9 +491,7 @@ function startRun(mode, idx){
   G.maxLives=3+(save.upgrades.extraLife?1:0); G.lives=G.maxLives;
   G.smashed=0; G.elapsed=0; G.endlessWave=1;
   G.spawnAcc=0; G.earnedCoins=0; G.slowmo=0; G.magnet=save.upgrades.magnet; G.frenzy=0; G.multiTimer=0;
-  if(G.boss){ scene.remove(G.boss); G.boss=null; }
-  G.bossPhase=false; G.hitStop=0;
-  showBossBar(false);
+  G.boss=null; G.bossPhase=false; G.hitStop=0;
   resetMissionRun();
   // clear active bugs
   G.bugs.forEach(b=>releaseBug(b)); G.bugs=[];
@@ -510,7 +506,7 @@ function startRun(mode, idx){
   buildDecor(G.cfg);
   Audio.startMusic(idx, mode==='endless');
   showOverlay(null);
-  els.hud.classList.remove('hide'); els.muteBtn.classList.remove('hide');
+  els.hud.classList.remove('hide'); els.muteBtn.classList.remove('hide'); els.fps.classList.remove('hide');
   showBossBar(false);
   renderLives(); renderPowers(); updateHUD();
   if(G.daily) toast('DAILY RUN', 'Seed '+todayStr());
@@ -954,9 +950,6 @@ function boot(){
   buildModes();
   showOverlay('menu');
   requestAnimationFrame(tick);
-  let menuMusicStarted=false;
-  function kickstartAudio(){ if(menuMusicStarted) return; menuMusicStarted=true; Audio.init(); Audio.resume(); if(G.state==='menu') Audio.startMenuMusic(); }
-  ['pointerdown','touchstart','keydown','click'].forEach(ev=>document.addEventListener(ev, kickstartAudio, { passive:true }));
 }
 if (window.BSData) {
   window.BSData.load().then(loaded=>{ if(loaded) save = deepMerge(save, loaded); boot(); })
