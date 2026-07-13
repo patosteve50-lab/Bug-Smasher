@@ -3,28 +3,28 @@
   <head>
     <link rel="stylesheet" type="text/css" href="splash.css" />
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height=device-height, user-scalable=0"
-    />
-    <title>devvit</title>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height=device-height, user-scalable=0" />
+    <title>Bug Smasher</title>
+    <style>
+      body.app { background:radial-gradient(circle at 50% 35%, #1e3412, #060a04); color:#eafce0;
+        font-family:'Trebuchet MS','Segoe UI',sans-serif; display:flex; flex-direction:column;
+        align-items:center; justify-content:center; height:100vh; margin:0; text-align:center; }
+      .bs-title { font-size:clamp(40px,12vw,90px); font-weight:900; letter-spacing:.02em; line-height:.9;
+        color:#c9ff9e; text-shadow:0 0 40px rgba(146,222,91,.55), 0 6px 0 #2c4718; margin:0; }
+      .bs-title span { color:#ffd76a; text-shadow:0 0 40px rgba(255,200,80,.5), 0 6px 0 #7a5410; }
+      .bs-sub { font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:#9dc487; margin:18px 0 26px; max-width:340px; line-height:2; }
+      .start-button { pointer-events:auto; cursor:pointer; padding:16px 52px; font-family:inherit; font-size:16px;
+        font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0a1405; border:none; border-radius:40px;
+        background:linear-gradient(180deg,#b6f76e,#79c93f); box-shadow:0 8px 0 #3f6e1c, 0 12px 30px rgba(0,0,0,.5); }
+      .start-button:active { transform:translateY(5px); box-shadow:0 3px 0 #3f6e1c; }
+      .bs-emoji { font-size:56px; margin-bottom:6px; }
+    </style>
   </head>
   <body class="app">
-    <img class="snoo" src="/snoo.png" alt="Snoo" />
-    <div class="content">
-      <h1 class="title" id="title"></h1>
-      <p class="description">Edit <span class="code">src/client/splash.ts</span> to get started.</p>
-    </div>
-    <div>
-      <button class="start-button" id="start-button">Start</button>
-    </div>
-    <footer class="footer">
-      <div class="docs-link" tabindex="0" id="docs-link">Docs</div>
-      <span class="divider">|</span>
-      <div class="docs-link" tabindex="0" id="playtest-link">r/Devvit</div>
-      <span class="divider">|</span>
-      <div class="docs-link" tabindex="0" id="discord-link">Discord</div>
-    </footer>
+    <div class="bs-emoji">🐛</div>
+    <h1 class="bs-title">BUG<span> SMASHER</span></h1>
+    <p class="bs-sub">Tap the bugs before they escape. Daily swarm · combos · bosses.</p>
+    <button class="start-button" id="start-button">Play</button>
     <script type="module" src="splash.ts" defer></script>
   </body>
 </html>

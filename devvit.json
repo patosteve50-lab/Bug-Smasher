@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "<% name %>",
+  "name": "bug-smasher-v1",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
@@ -21,7 +21,7 @@
     "items": [
       {
         "label": "Create a new post",
-        "description": "<% name %>",
+        "description": "bug-smasher-v1",
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/post-create"
