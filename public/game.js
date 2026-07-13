@@ -336,13 +336,15 @@ function buildModes(){
   els.modeGrid.innerHTML = `
     <div class="mode" data-m="campaign"><div class="mi">🗺️</div><div class="mn">Campaign</div><div class="md">7 biomes · bosses</div></div>
     <div class="mode ${dDone?'dailydone':''}" data-m="daily"><div class="badge">DAILY</div><div class="mi">📅</div><div class="mn">Daily Run</div><div class="md">${dDone?'★ Done '+save.daily.best:'One seed · one shot'}</div></div>
-    <div class="mode" data-m="endless"><div class="mi">♾️</div><div class="mn">Endless</div><div class="md">Best wave ${save.endlessBest}</div></div>`;
+    <div class="mode" data-m="endless"><div class="mi">♾️</div><div class="mn">Endless</div><div class="md">Best wave ${save.endlessBest}</div></div>
+    <div class="mode" data-m="howto"><div class="mi">❓</div><div class="mn">How to Play</div><div class="md">Quick guide</div></div>`;
   els.modeGrid.querySelectorAll('.mode').forEach(el=>{
     el.onclick=()=>{ const m=el.dataset.m;
       Audio.init(); Audio.resume();
       if(m==='campaign'){ buildLevelGrid(); showOverlay('levelSelect'); }
       else if(m==='daily'){ startDaily(); }
       else if(m==='endless'){ startEndless(); }
+      else if(m==='howto'){ document.getElementById('howto').classList.add('show'); }
     };
   });
 }
@@ -548,17 +550,17 @@ function chooseType(){
 function spawnBug(forceType, atPos){
   const type=forceType||chooseType();
   const bug=getBug(type);
-  const R=15; let x,z;
+  const R=12; let x,z;
   if(atPos){ x=atPos.x; z=atPos.z; }
   else { const edge=Math.floor(rand()*4);
-    if(edge===0){x=-R;z=(rand()-0.5)*20;} else if(edge===1){x=R;z=(rand()-0.5)*20;}
-    else if(edge===2){x=(rand()-0.5)*24;z=-12;} else {x=(rand()-0.5)*24;z=10;} }
+    if(edge===0){x=-R;z=(rand()-0.5)*14;} else if(edge===1){x=R;z=(rand()-0.5)*14;}
+    else if(edge===2){x=(rand()-0.5)*18;z=-10;} else {x=(rand()-0.5)*18;z=9;} }
   const flying=bug.userData.spec.fly;
   bug.position.set(x, flying?2.2+rand()*1.5:0.5, z);
   const tx=(rand()-0.5)*8, tz=(rand()-0.5)*8;
   const dir=new THREE.Vector3(tx-x,0,tz-z).normalize();
   const speedScale = G.mode==='endless' ? 1+G.endlessWave*0.04 : G.cfg.speed;
-  const base=0.028*speedScale*bug.userData.spec.sp;
+  const base=0.020*speedScale*bug.userData.spec.sp;
   bug.userData.vel=dir.multiplyScalar(base);
   bug.userData.baseY=bug.position.y; bug.userData.turnT=1+rand()*2; bug.userData.lifeT=0;
   scene.add(bug); G.bugs.push(bug);
@@ -576,6 +578,7 @@ function findBugFromHit(obj){
 function handleTap(cx,cy){
   if(G.state!=='play') return;
   Audio.resume();
+  camera.updateMatrixWorld();
   pointer.x=(cx/innerWidth)*2-1; pointer.y=-(cy/innerHeight)*2+1;
   raycaster.setFromCamera(pointer,camera);
   // ensure world matrices are current (pooled bugs may be freshly placed this frame)
@@ -807,6 +810,7 @@ $('backFromMissions').onclick=()=>showOverlay('menu');
 $('retryBtn').onclick=()=>{ if(G.mode==='endless') startEndless(); else if(G.daily && save.daily.done){ showOverlay('menu'); } else startLevel(G.levelIdx,'campaign', G.daily); };
 $('nextBtn').onclick=()=>startLevel(Math.min(G.levelIdx+1,LEVELS.length-1),'campaign');
 $('menuBtn').onclick=()=>showOverlay('menu');
+{ const _hc=document.getElementById('howtoClose'); if(_hc) _hc.onclick=()=>{ const h=document.getElementById('howto'); if(h) h.classList.remove('show'); }; }
 addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
 
 // ---------- multi-smash AoE ----------
@@ -894,7 +898,7 @@ function tick(nowMs){
       b.rotation.y=Math.atan2(u.vel.x,u.vel.z);
       if(u.spec.fly){ b.position.y=u.baseY+Math.sin(u.t)*0.35; u.wings.forEach((w,wi)=>{ w.rotation.z=(wi===0?1:-1)*(0.3+Math.sin(u.t*4)*0.9); }); }
       else { b.position.y=0.5+Math.abs(Math.sin(u.t))*0.06; u.legs.forEach(l=>{ l.mesh.rotation.x=0.3+Math.sin(u.t+l.phase)*0.4; }); }
-      if(Math.abs(b.position.x)>17||b.position.z<-14||b.position.z>12) bugEscaped(b);
+      if(Math.abs(b.position.x)>13||b.position.z<-11||b.position.z>10) bugEscaped(b);
     }
 
     // pickups

@@ -43,12 +43,29 @@
   .pw { font-size:11px; letter-spacing:.08em; padding:6px 12px; border-radius:20px; font-weight:700;
     background:rgba(80,160,255,.2); border:1px solid rgba(120,190,255,.5); color:#bfe0ff; }
 
-  .overlay { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:18px; text-align:center; z-index:10; padding:24px; overflow-y:auto;
-    background:radial-gradient(circle at 50% 35%, rgba(30,52,18,.9), rgba(6,10,4,.97)); color:#eafce0; }
-  .title { font-size:clamp(46px,11vw,110px); font-weight:900; letter-spacing:.02em; line-height:.9;
-    color:#c9ff9e; text-shadow:0 0 40px rgba(146,222,91,.55), 0 6px 0 #2c4718; }
+  .overlay { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    gap:16px; text-align:center; z-index:10; padding:24px 20px 40px; overflow-y:auto; overflow-x:hidden;
+    background:radial-gradient(circle at 50% 30%, rgba(30,52,18,.92), rgba(6,10,4,.98)); color:#eafce0; }
+  .overlay::-webkit-scrollbar { width:0; height:0; }
+  .overlay > * { flex-shrink:0; }
+  .overlay > *:first-child { margin-top:auto; }
+  .overlay > *:last-child { margin-bottom:auto; }
+  .title { font-size:clamp(40px,10vw,104px); font-weight:900; letter-spacing:.01em; line-height:1.02; padding-top:4px;
+    color:#c9ff9e; text-shadow:0 0 34px rgba(146,222,91,.5), 0 4px 0 #2c4718; }
   .title span { color:#ffd76a; text-shadow:0 0 40px rgba(255,200,80,.5), 0 6px 0 #7a5410; }
+  .logo { display:flex; flex-direction:column; align-items:center; gap:2px; animation:logoFloat 3.6s ease-in-out infinite; }
+  .logo-bug { font-size:46px; filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)); animation:bugWobble 4s ease-in-out infinite; transform-origin:center; }
+  .title.stack { display:flex; flex-direction:column; line-height:.84; letter-spacing:.01em; }
+  .title.stack .t1 { color:#c9ff9e; text-shadow:0 0 34px rgba(146,222,91,.55), 0 5px 0 #2c4718, 0 7px 12px rgba(0,0,0,.5); }
+  .title.stack .t2 { color:#ffd76a; text-shadow:0 0 34px rgba(255,200,80,.5), 0 5px 0 #7a5410, 0 7px 12px rgba(0,0,0,.5); }
+  @keyframes logoFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+  @keyframes bugWobble { 0%,100%{transform:rotate(-7deg);} 50%{transform:rotate(7deg);} }
+  .howto { position:fixed; inset:0; z-index:11; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(4,8,3,.85); }
+  .howto.show { display:flex; }
+  .howto-card { max-width:340px; background:linear-gradient(160deg,rgba(30,50,18,.97),rgba(14,24,9,.97)); border:1px solid rgba(146,222,91,.4); border-radius:18px; padding:24px; text-align:left; color:#eafce0; }
+  .howto-card h3 { color:#c9ff9e; font-size:20px; margin-bottom:14px; text-align:center; letter-spacing:.06em; }
+  .howto-card p { font-size:13px; line-height:1.7; color:#bcd6a8; margin-bottom:8px; }
+  .howto-card b { color:#ffd76a; }
   .sub { font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:#9dc487; max-width:520px; line-height:2.1; }
   .btn { pointer-events:auto; cursor:pointer; padding:16px 46px; font-family:inherit; font-size:15px; font-weight:800;
     letter-spacing:.16em; text-transform:uppercase; color:#0a1405; border:none; border-radius:40px;
@@ -59,6 +76,19 @@
   .btn.alt:active { box-shadow:0 3px 0 #a3781c, 0 6px 16px rgba(0,0,0,.5); }
   .btn.sm { padding:12px 28px; font-size:12px; }
   .hide { display:none !important; }
+
+  @media (max-width:520px){
+    .overlay { gap:12px; padding:26px 16px; }
+    .title { font-size:clamp(38px,12vw,64px); line-height:1.04; }
+    .sub { font-size:11px; letter-spacing:.18em; line-height:1.9; max-width:90vw; }
+    .btn { padding:14px 34px; font-size:14px; }
+    .btn.sm { padding:11px 22px; font-size:11px; }
+    .modes { gap:10px; grid-template-columns:1fr 1fr; }
+    .mode { padding:14px 10px; }
+    .mode .mi { font-size:32px; }
+    .mode .mn { font-size:13px; }
+    .coinpill { font-size:14px; padding:7px 14px; }
+  }
 
   .modes { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; width:min(640px,92vw); margin-top:4px; }
   .mode { pointer-events:auto; cursor:pointer; padding:20px 16px; border-radius:16px; text-align:center;
@@ -161,7 +191,7 @@
 
 <!-- MENU -->
 <div class="overlay" id="menu">
-  <h1 class="title">BUG<span> SMASHER</span></h1>
+  <div class="logo"><div class="logo-bug">🐞</div><h1 class="title stack"><span class="t1">BUG</span><span class="t2">SMASHER</span></h1></div>
   <p class="sub">Tap the bugs before they escape. Chain combos, dodge friendly critters, beat the biome bosses.</p>
   <div class="coinpill">✦ <span id="menuCoins">0</span> Shards</div>
   <div class="modes" id="modeGrid"></div>
@@ -209,5 +239,17 @@
 <script src="/three.min.js"></script>
 <script src="/data.js"></script>
 <script src="/game.js"></script>
+<div class="howto" id="howto">
+  <div class="howto-card">
+    <h3>How to Play</h3>
+    <p>👆 <b>Tap bugs</b> before they escape the field.</p>
+    <p>🔥 <b>Chain fast taps</b> to build a combo multiplier.</p>
+    <p>🐞 <b>Don't tap ladybugs</b> — they're friendly. It costs points.</p>
+    <p>🕷️ <b>Tough bugs</b> take more than one hit.</p>
+    <p>✨ <b>Grab power-ups</b> that drop from kills.</p>
+    <p>👑 <b>Clear the quota</b> to face the biome boss.</p>
+    <button class="btn" id="howtoClose" style="margin-top:14px;width:100%;">Got it</button>
+  </div>
+</div>
 </body>
 </html>
