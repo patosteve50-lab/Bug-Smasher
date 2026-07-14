@@ -151,8 +151,8 @@
   .row { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
   .coinpill { display:inline-flex; align-items:center; gap:6px; font-size:15px; font-weight:800; color:#ffd76a;
     background:rgba(255,200,80,.12); border:1px solid rgba(255,200,80,.4); padding:8px 16px; border-radius:22px; }
-  .mute { position:fixed; top:16px; right:50%; transform:translateX(min(50vw - 60px, 300px)); }
-  .quitbtn { position:fixed; top:16px; left:50%; transform:translateX(-54px); width:36px; height:36px; font-size:15px; opacity:.85; z-index:12; }
+  .topbtns { position:fixed; top:22px; left:50%; transform:translateX(calc(-50% + 30px)); display:flex; gap:8px; z-index:12; }
+  .topbtns .iconbtn { width:36px; height:36px; }
   .iconbtn { pointer-events:auto; cursor:pointer; width:40px; height:40px; border-radius:12px; font-size:18px;
     display:flex; align-items:center; justify-content:center; background:rgba(24,38,16,.82);
     border:1px solid rgba(146,222,91,.28); color:#c9ff9e; }
@@ -195,8 +195,7 @@
   </div>
 </div>
 
-<button class="iconbtn mute hud hide" id="muteBtn">🔊</button>
-<button class="iconbtn quitbtn hud hide" id="quitBtn" title="Quit to menu">✕</button>
+<div class="topbtns hud hide" id="topBtns"><button class="iconbtn" id="quitBtn" title="Quit to menu">✕</button><button class="iconbtn" id="muteBtn">🔊</button></div>
 
 <!-- MENU -->
 <div class="overlay" id="menu">

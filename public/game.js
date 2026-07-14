@@ -314,11 +314,11 @@ const els={};
 ['hud','score','coins','combo','multiTxt','lives','progress','barLeft','barRight','powerRow','scoreLabel',
  'menu','menuCoins','levelSelect','levelGrid','shopScreen','shopGrid','shopCoins','modeGrid',
  'missionScreen','missionList','missionSub','endScreen','endTitle','endStars','finalScore','earnedCoins',
- 'muteBtn','quitBtn','flash','toast','nextBtn','bossbar','bossName','bossHp','bossHpTxt','fps'].forEach(k=>els[k]=$(k));
+ 'muteBtn','quitBtn','topBtns','flash','toast','nextBtn','bossbar','bossName','bossHp','bossHpTxt','fps'].forEach(k=>els[k]=$(k));
 
 function showOverlay(name){
   ['menu','levelSelect','shopScreen','missionScreen','endScreen'].forEach(o=>els[o].classList.add('hide'));
-  els.hud.classList.add('hide'); els.muteBtn.classList.add('hide'); els.quitBtn.classList.add('hide'); els.fps.classList.add('hide');
+  els.hud.classList.add('hide'); els.topBtns.classList.add('hide'); els.fps.classList.add('hide');
   if(name) els[name].classList.remove('hide');
   if(name==='menu'){ els.menuCoins.textContent=save.coins; buildModes(); G.state='menu'; Audio.startMenuMusic(); }
 }
@@ -512,7 +512,7 @@ function startRun(mode, idx){
   buildDecor(G.cfg);
   Audio.startMusic(idx, mode==='endless');
   showOverlay(null);
-  els.hud.classList.remove('hide'); els.muteBtn.classList.remove('hide'); els.quitBtn.classList.remove('hide');
+  els.hud.classList.remove('hide'); els.topBtns.classList.remove('hide');
   showBossBar(false);
   renderLives(); renderPowers(); updateHUD();
   if(G.daily) toast('DAILY RUN', 'Seed '+todayStr());
