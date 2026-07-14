@@ -61,7 +61,8 @@
   .title.stack .t2 { color:#ffd76a; text-shadow:0 0 34px rgba(255,200,80,.5), 0 5px 0 #7a5410, 0 7px 12px rgba(0,0,0,.5); }
   @keyframes logoFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
   @keyframes bugWobble { 0%,100%{transform:rotate(-7deg);} 50%{transform:rotate(7deg);} }
-  .howto { position:fixed; inset:0; z-index:11; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(4,8,3,.85); }
+  .howto { position:fixed; inset:0; z-index:11; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(4,8,3,.85); pointer-events:auto; }
+  .howto .btn { pointer-events:auto; cursor:pointer; }
   .howto.show { display:flex; }
   .howto-card { max-width:340px; background:linear-gradient(160deg,rgba(30,50,18,.97),rgba(14,24,9,.97)); border:1px solid rgba(146,222,91,.4); border-radius:18px; padding:24px; text-align:left; color:#eafce0; }
   .howto-card h3 { color:#c9ff9e; font-size:20px; margin-bottom:14px; text-align:center; letter-spacing:.06em; }
@@ -79,7 +80,7 @@
   .hide { display:none !important; }
 
   @media (max-width:520px){
-    .overlay { gap:8px; padding:16px 14px 28px; justify-content:flex-start; }
+    .overlay { gap:12px; padding:20px 16px 48px; justify-content:flex-start; }
     .sub { display:none; }
     .logo-bug { font-size:34px; }
     .title.stack .t1, .title.stack .t2 { font-size:clamp(34px,11vw,52px); }

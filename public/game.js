@@ -344,7 +344,7 @@ function buildModes(){
       if(m==='campaign'){ buildLevelGrid(); showOverlay('levelSelect'); }
       else if(m==='daily'){ startDaily(); }
       else if(m==='endless'){ startEndless(); }
-      else if(m==='howto'){ document.getElementById('howto').classList.add('show'); }
+      else if(m==='howto'){ const hp=document.getElementById('howto'); hp.classList.add('show'); const cb=document.getElementById('howtoClose'); if(cb) cb.onclick=(ev)=>{ ev.stopPropagation(); hp.classList.remove('show'); }; hp.onclick=(ev)=>{ if(ev.target===hp) hp.classList.remove('show'); }; }
     };
   });
 }
