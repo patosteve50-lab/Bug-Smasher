@@ -9,7 +9,7 @@
 const SAVE_KEY = 'bugsmasher_save_v2';
 let save = {
   coins:0, best:{}, unlocked:1,
-  upgrades:{ hammer:0, magnet:false, slowmo:false, extraLife:false },
+  upgrades:{ hammer:0, magnet:false, slowmo:false, extraLife:false, coinBoost:false, comboGuard:false, starterFrenzy:false, wideMagnet:false, reinforced:false },
   endlessBest:0,
   daily:{ date:'', done:false, best:0 },
   missions:null, missionRerollDate:'',
@@ -166,6 +166,8 @@ sun.position.set(-8,20,6); sun.castShadow=true; sun.shadow.mapSize.set(1024,1024
 sun.shadow.camera.left=-16; sun.shadow.camera.right=16; sun.shadow.camera.top=16; sun.shadow.camera.bottom=-16;
 scene.add(sun);
 const fill = new THREE.PointLight(0x88ccff,0.5,60); fill.position.set(10,8,-6); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xffffff, 0.85); rim.position.set(6,10,-14); scene.add(rim);
+const rimTint = new THREE.PointLight(0xffffff, 0.0, 90); rimTint.position.set(0,14,-16); scene.add(rimTint);
 
 const groundMat = new THREE.MeshStandardMaterial({ color:0x24451c, roughness:0.95 });
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(40,40), groundMat);
@@ -183,12 +185,16 @@ const GEO = {
   spot: new THREE.SphereGeometry(0.08,6,6),
   plate: new THREE.IcosahedronGeometry(0.62,0),
   octa: new THREE.OctahedronGeometry(0.4,0),
+  shell: new THREE.SphereGeometry(0.6,14,10),
+  eyeShine: new THREE.SphereGeometry(0.045,6,6),
 };
-const eyeMat = new THREE.MeshStandardMaterial({ color:0x111111, roughness:0.2, emissive:0xff2222, emissiveIntensity:0.3 });
-const wingMat = new THREE.MeshStandardMaterial({ color:0xcfe6ff, transparent:true, opacity:0.4, roughness:0.1, side:THREE.DoubleSide });
-const bodyMatCache = {}, accMatCache = {};
-function bodyMat(color){ if(!bodyMatCache[color]) bodyMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.55, metalness:0.15, flatShading:true }); return bodyMatCache[color]; }
-function accMat(color){ if(!accMatCache[color]) accMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.5, metalness:0.2, flatShading:true }); return accMatCache[color]; }
+const eyeMat = new THREE.MeshStandardMaterial({ color:0x0a0a12, roughness:0.12, metalness:0.4, emissive:0xff3344, emissiveIntensity:0.7 });
+const eyeShineMat = new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.05, emissive:0xffffff, emissiveIntensity:0.35 });
+const wingMat = new THREE.MeshStandardMaterial({ color:0xdff0ff, transparent:true, opacity:0.38, roughness:0.05, metalness:0.3, side:THREE.DoubleSide });
+const bodyMatCache = {}, accMatCache = {}, shellMatCache = {};
+function bodyMat(color){ if(!bodyMatCache[color]) bodyMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.34, metalness:0.3 }); return bodyMatCache[color]; }
+function accMat(color){ if(!accMatCache[color]) accMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.3, metalness:0.35 }); return accMatCache[color]; }
+function shellMat(color){ if(!shellMatCache[color]) shellMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.18, metalness:0.55, emissive:color, emissiveIntensity:0.12 }); return shellMatCache[color]; }
 
 // ---------- decor via InstancedMesh (perf) ----------
 let decorMesh=null;
@@ -246,9 +252,11 @@ function buildBugMesh(type){
   const spec=BUGS[type]; const g=new THREE.Group();
   const bm=bodyMat(spec.color), am=accMat(spec.accent);
   const abd=new THREE.Mesh(GEO.abd,bm); abd.scale.set(1,0.8,1.35); abd.position.z=0.25; g.add(abd);
+  const sm=shellMat(spec.accent); const shell=new THREE.Mesh(GEO.shell,sm); shell.scale.set(0.92,0.6,1.15); shell.position.set(0,0.16,0.26); g.add(shell);
   const thx=new THREE.Mesh(GEO.thx,am); thx.position.z=-0.35; g.add(thx);
   const head=new THREE.Mesh(GEO.head,bm); head.position.z=-0.75; g.add(head);
-  [-0.15,0.15].forEach(x=>{ const e=new THREE.Mesh(GEO.eye,eyeMat); e.position.set(x,0.12,-0.92); g.add(e); });
+  [-0.15,0.15].forEach(x=>{ const e=new THREE.Mesh(GEO.eye,eyeMat); e.position.set(x,0.12,-0.92); g.add(e);
+    const sh=new THREE.Mesh(GEO.eyeShine,eyeShineMat); sh.position.set(x-0.03,0.17,-0.99); g.add(sh); });
   if(spec.stripes){ for(let i=0;i<2;i++){ const s=new THREE.Mesh(GEO.stripe,am); s.rotation.y=Math.PI/2; s.position.z=0.1+i*0.3; s.scale.set(1,0.8,1); g.add(s);} }
   if(spec.spots){ for(let i=0;i<5;i++){ const s=new THREE.Mesh(GEO.spot,am); const a=i/5*Math.PI*2; s.position.set(Math.cos(a)*0.3,0.35,0.25+Math.sin(a)*0.35); g.add(s);} }
   if(spec.armored){ for(let i=0;i<3;i++){ const pl=new THREE.Mesh(GEO.plate,am); pl.scale.set(1,0.5,0.7); pl.position.set(0,0.28,0.1+i*0.28-0.2); g.add(pl);} }
@@ -370,6 +378,11 @@ const SHOP_ITEMS=[
   { key:'magnet', name:'Shard Magnet', desc:'Auto-collect shard & power-up drops.', cost:150, get owned(){return save.upgrades.magnet;}, buy(){save.upgrades.magnet=true;} },
   { key:'slowmo', name:'Reflex Chip', desc:'Slow-mo power-ups last 50% longer.', cost:140, get owned(){return save.upgrades.slowmo;}, buy(){save.upgrades.slowmo=true;} },
   { key:'extraLife', name:'Spare Heart', desc:'Start every run with +1 life.', cost:200, get owned(){return save.upgrades.extraLife;}, buy(){save.upgrades.extraLife=true;} },
+  { key:'coinBoost', name:'Coin Boost', desc:'+25% shards earned from every run.', cost:220, get owned(){return save.upgrades.coinBoost;}, buy(){save.upgrades.coinBoost=true;} },
+  { key:'comboGuard', name:'Combo Guard', desc:'Combos last longer before they break.', cost:180, get owned(){return save.upgrades.comboGuard;}, buy(){save.upgrades.comboGuard=true;} },
+  { key:'starterFrenzy', name:'Kickstart', desc:'Begin every run with a 4s 2x frenzy.', cost:240, get owned(){return save.upgrades.starterFrenzy;}, buy(){save.upgrades.starterFrenzy=true;} },
+  { key:'wideMagnet', name:'Wide Magnet', desc:'Magnet grabs drops sooner and faster. (needs Shard Magnet)', cost:160, get owned(){return save.upgrades.wideMagnet;}, buy(){save.upgrades.wideMagnet=true;} },
+  { key:'reinforced', name:'Reinforced Heart', desc:'Start with another +1 life. (needs Spare Heart)', cost:300, get owned(){return save.upgrades.reinforced;}, buy(){save.upgrades.reinforced=true;} },
 ];
 function buildShop(){
   els.shopCoins.textContent=save.coins; els.shopGrid.innerHTML='';
@@ -516,9 +529,9 @@ function startRun(mode, idx){
   G.mode=mode; G.state='play';
   G.levelIdx=idx; G.cfg=LEVELS[idx];
   G.score=0; G.combo=0; G.comboTimer=0; G.bestComboRun=0;
-  G.maxLives=3+(save.upgrades.extraLife?1:0); G.lives=G.maxLives;
+  G.maxLives=3+(save.upgrades.extraLife?1:0)+(save.upgrades.reinforced?1:0); G.lives=G.maxLives;
   G.smashed=0; G.elapsed=0; G.endlessWave=1;
-  G.spawnAcc=0; G.earnedCoins=0; G.slowmo=0; G.magnet=save.upgrades.magnet; G.frenzy=0; G.multiTimer=0;
+  G.spawnAcc=0; G.earnedCoins=0; G.slowmo=0; G.magnet=save.upgrades.magnet; G.frenzy=save.upgrades.starterFrenzy?4:0; G.multiTimer=0;
   if(G.boss){ scene.remove(G.boss); G.boss=null; }
   G.bossPhase=false; G.hitStop=0;
   showBossBar(false);
@@ -533,6 +546,8 @@ function startRun(mode, idx){
   scene.background=new THREE.Color(G.cfg.sky);
   scene.fog=new THREE.Fog(G.cfg.fog,18,46);
   groundMat.color.setHex(G.cfg.ground);
+  { const c=new THREE.Color(G.cfg.sky); const hsl={}; c.getHSL(hsl); c.setHSL(hsl.h,Math.min(1,hsl.s+0.4),Math.min(0.7,hsl.l+0.45));
+    rimTint.color.copy(c); rimTint.intensity=0.9; }
   buildDecor(G.cfg);
   Audio.startMusic(idx, mode==='endless');
   showOverlay(null);
@@ -665,7 +680,7 @@ function killBug(bug, point){
   const u=bug.userData;
   u.alive=false;
   const pts=u.spec.pts;
-  G.combo++; G.comboTimer=1.6; G.bestComboRun=Math.max(G.bestComboRun,G.combo);
+  G.combo++; G.comboTimer=save.upgrades.comboGuard?2.2:1.6; G.bestComboRun=Math.max(G.bestComboRun,G.combo);
   const mult=comboMult(); const fMult=G.frenzy>0?2:1;
   addScore(pts*mult*fMult);
   G.smashed++; save.stats.totalSmashed++;
@@ -804,6 +819,7 @@ function endLevel(win){
     if(G.daily){ save.daily.done=true; save.daily.best=Math.max(save.daily.best,G.score); }
   }
   Audio.sfx[win&&G.mode!=='endless'?'win':'lose']();
+  if(save.upgrades.coinBoost) G.earnedCoins=Math.round(G.earnedCoins*1.25);
   save.coins+=G.earnedCoins;
   persist();
   submitScore(G.mode, G.score, G.endlessWave); // feeds the daily leaderboard when on Reddit
@@ -896,8 +912,8 @@ function tick(nowMs){
     if(!G.bossPhase){
       G.spawnAcc+=dt;
       const prog = G.mode==='endless' ? Math.min(0.6, G.endlessWave*0.04) : (1-G.elapsed/G.time);
-      const rate=G.spawnEvery*(0.7+0.3*prog);
-      if(G.spawnAcc>=rate){ G.spawnAcc=0; spawnBug(); if(rand()<0.25) spawnBug(); }
+      const rate=G.spawnEvery*(0.92+0.25*prog);
+      if(G.spawnAcc>=rate){ G.spawnAcc=0; spawnBug(); if(prog>0.33 && rand()<0.15) spawnBug(); }
     }
 
     // boss update
@@ -939,7 +955,7 @@ function tick(nowMs){
       p.children[0].rotation.y+=dt*3; p.children[0].rotation.x+=dt*1.5;
       p.position.y=1.2+Math.sin(p.userData.t*3)*0.15;
       if(p.userData.t>7){ scene.remove(p); pickups.splice(i,1); if(pickupPool.length<20) pickupPool.push(p); continue; }
-      if(G.magnet && p.userData.t>0.5){ collectPickup(p); }
+      if(G.magnet && p.userData.t>(save.upgrades.wideMagnet?0.2:0.5)){ collectPickup(p); }
     }
 
     updateHUD();
