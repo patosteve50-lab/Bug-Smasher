@@ -61,7 +61,7 @@
   }
 
   async function submitScore(mode, score, wave) {
-    if (!online) return null;
+    // Always attempt — tryFetch returns null harmlessly if there's no server.
     return tryFetch(API.submitScore, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
