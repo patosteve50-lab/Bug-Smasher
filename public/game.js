@@ -404,6 +404,30 @@ function ensureMissions(){
   }
 }
 function missionDef(id){ return MISSION_POOL.find(m=>m.id===id); }
+async function buildLeaderboard(){
+  const list = document.getElementById('lbList');
+  if(!list) return;
+  list.innerHTML = '<div class="mission"><div class="mtxt"><div class="mtitle">Loading…</div></div></div>';
+  let data = { entries: [] };
+  try { if(window.BSData && window.BSData.leaderboard) data = await window.BSData.leaderboard(); } catch(e){}
+  let me = '';
+  try { if(window.BSData && window.BSData.username) me = window.BSData.username(); } catch(e){}
+  const rows = (data && data.entries) ? data.entries : [];
+  if(!rows.length){
+    list.innerHTML = '<div class="mission"><div class="mtxt"><div class="mtitle">No scores yet today</div><div class="mprog">Play a run to claim a spot!</div></div></div>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  list.innerHTML = rows.map(function(r,i){
+    const rank = medals[i] || ('#'+(i+1));
+    const isMe = me && r.name===me;
+    const nm = isMe ? 'You' : ('u/'+(r.name||'anon'));
+    return '<div class="mission'+(isMe?' done':'')+'"><div class="mcheck">'+rank+'</div>'+
+      '<div class="mtxt"><div class="mtitle">'+nm+'</div></div>'+
+      '<div class="mrew">'+(r.score||0)+'</div></div>';
+  }).join('');
+}
+
 function buildMissions(){
   ensureMissions();
   els.missionList.innerHTML='';
@@ -806,6 +830,12 @@ function quitToMenu(){ Audio.stopMusic(); Audio.setIntensity(false); if(G.boss){
 els.quitBtn.onclick=()=>quitToMenu();
 $('shopBtn').onclick=()=>{ buildShop(); showOverlay('shopScreen'); };
 $('missionsBtn').onclick=()=>{ buildMissions(); showOverlay('missionScreen'); };
+{ const lbBtn=document.getElementById('leaderboardBtn'); if(lbBtn) lbBtn.onclick=()=>{
+    ['menu','levelSelect','shopScreen','missionScreen','endScreen'].forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.add('hide'); });
+    const ls=document.getElementById('leaderboardScreen'); if(ls) ls.classList.remove('hide');
+    buildLeaderboard();
+  }; }
+{ const bfl=document.getElementById('backFromLeaderboard'); if(bfl) bfl.onclick=()=>{ const ls=document.getElementById('leaderboardScreen'); if(ls) ls.classList.add('hide'); showOverlay('menu'); }; }
 $('backFromLevels').onclick=()=>showOverlay('menu');
 $('backFromShop').onclick=()=>showOverlay('menu');
 $('backFromMissions').onclick=()=>showOverlay('menu');

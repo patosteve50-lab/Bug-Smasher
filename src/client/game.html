@@ -204,6 +204,7 @@
   <div class="coinpill">✦ <span id="menuCoins">0</span> Shards</div>
   <div class="modes" id="modeGrid"></div>
   <div class="row">
+    <button class="btn alt sm" id="leaderboardBtn">🏆 Ranks</button>
     <button class="btn alt sm" id="missionsBtn">Missions</button>
     <button class="btn alt sm" id="shopBtn">Shop</button>
   </div>
@@ -234,6 +235,13 @@
 </div>
 
 <!-- GAME OVER / WIN -->
+<div class="overlay hide" id="leaderboardScreen">
+  <h1 class="title" style="font-size:clamp(30px,7vw,52px)">🏆 RANKS</h1>
+  <p class="sub" id="lbSub">Today's top smashers · resets midnight UTC</p>
+  <div class="missions" id="lbList"></div>
+  <button class="btn alt" id="backFromLeaderboard">Back</button>
+</div>
+
 <div class="overlay hide" id="endScreen">
   <h1 class="title" id="endTitle">TIME!</h1>
   <p class="sub" id="endStars"></p>
