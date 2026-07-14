@@ -59,6 +59,8 @@
   .title.stack { display:flex; flex-direction:column; line-height:.84; letter-spacing:.01em; }
   .title.stack .t1 { color:#c9ff9e; text-shadow:0 0 34px rgba(146,222,91,.55), 0 5px 0 #2c4718, 0 7px 12px rgba(0,0,0,.5); }
   .title.stack .t2 { color:#ffd76a; text-shadow:0 0 34px rgba(255,200,80,.5), 0 5px 0 #7a5410, 0 7px 12px rgba(0,0,0,.5); }
+  .screen-title { position:sticky; top:0; z-index:2; width:100%; padding:14px 0 12px; margin:0;
+    background:linear-gradient(180deg, rgba(8,14,5,.98) 60%, rgba(8,14,5,0)); }
   @keyframes logoFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
   @keyframes bugWobble { 0%,100%{transform:rotate(-7deg);} 50%{transform:rotate(7deg);} }
   .howto { position:fixed; inset:0; z-index:11; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(4,8,3,.85); pointer-events:auto; }
@@ -206,19 +208,19 @@
     <button class="btn alt sm" id="missionsBtn">Missions</button>
     <button class="btn alt sm" id="shopBtn">Shop</button>
   </div>
-  <div class="hint">Headphones on for the full experience</div>
+  <div class="hint" style="margin-top:10px;">Headphones on for the full experience</div>
 </div>
 
 <!-- LEVEL SELECT -->
 <div class="overlay hide" id="levelSelect">
-  <h1 class="title" style="font-size:clamp(34px,8vw,64px)">SELECT BIOME</h1>
+  <h1 class="title screen-title" style="font-size:clamp(30px,7vw,52px)">SELECT BIOME</h1>
   <div class="levels" id="levelGrid"></div>
   <button class="btn alt" id="backFromLevels">Back</button>
 </div>
 
 <!-- SHOP -->
 <div class="overlay hide" id="shopScreen">
-  <h1 class="title" style="font-size:clamp(34px,8vw,64px)">SHOP</h1>
+  <h1 class="title screen-title" style="font-size:clamp(30px,7vw,52px)">SHOP</h1>
   <div class="coinpill">✦ <span id="shopCoins">0</span> Shards</div>
   <div class="shop" id="shopGrid"></div>
   <button class="btn alt" id="backFromShop">Back</button>
@@ -226,7 +228,7 @@
 
 <!-- MISSIONS -->
 <div class="overlay hide" id="missionScreen">
-  <h1 class="title" style="font-size:clamp(34px,8vw,64px)">MISSIONS</h1>
+  <h1 class="title screen-title" style="font-size:clamp(30px,7vw,52px)">MISSIONS</h1>
   <p class="sub" id="missionSub">Complete challenges for bonus shards</p>
   <div class="missions" id="missionList"></div>
   <button class="btn alt" id="backFromMissions">Back</button>
