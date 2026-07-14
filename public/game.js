@@ -194,7 +194,7 @@ const wingMat = new THREE.MeshStandardMaterial({ color:0xdff0ff, transparent:tru
 const bodyMatCache = {}, accMatCache = {}, shellMatCache = {};
 function bodyMat(color){ if(!bodyMatCache[color]) bodyMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.34, metalness:0.3 }); return bodyMatCache[color]; }
 function accMat(color){ if(!accMatCache[color]) accMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.3, metalness:0.35 }); return accMatCache[color]; }
-function shellMat(color){ if(!shellMatCache[color]) shellMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.18, metalness:0.55, emissive:color, emissiveIntensity:0.12 }); return shellMatCache[color]; }
+function shellMat(color){ if(!shellMatCache[color]) shellMatCache[color]=new THREE.MeshStandardMaterial({ color, roughness:0.45, metalness:0.0, emissive:0x000000, emissiveIntensity:0 }); return shellMatCache[color]; }
 
 // ---------- decor via InstancedMesh (perf) ----------
 let decorMesh=null;
@@ -252,7 +252,7 @@ function buildBugMesh(type){
   const spec=BUGS[type]; const g=new THREE.Group();
   const bm=bodyMat(spec.color), am=accMat(spec.accent);
   const abd=new THREE.Mesh(GEO.abd,bm); abd.scale.set(1,0.8,1.35); abd.position.z=0.25; g.add(abd);
-  const sm=shellMat(spec.accent); const shell=new THREE.Mesh(GEO.shell,sm); shell.scale.set(0.92,0.6,1.15); shell.position.set(0,0.16,0.26); g.add(shell);
+  const sm=shellMat(spec.color); const shell=new THREE.Mesh(GEO.shell,sm); shell.scale.set(0.9,0.55,1.12); shell.position.set(0,0.15,0.26); g.add(shell);
   const thx=new THREE.Mesh(GEO.thx,am); thx.position.z=-0.35; g.add(thx);
   const head=new THREE.Mesh(GEO.head,bm); head.position.z=-0.75; g.add(head);
   [-0.15,0.15].forEach(x=>{ const e=new THREE.Mesh(GEO.eye,eyeMat); e.position.set(x,0.12,-0.92); g.add(e);
@@ -924,7 +924,7 @@ function tick(nowMs){
       b.position.x+=u.vel.x*slow*60*dt; 
       if(b.position.x>10||b.position.x<-10) u.vel.x*=-1;
       if(BOSSES[u.bossKey].fly){ b.position.y=3+Math.sin(u.t)*0.6; }
-      b.rotation.y=Math.atan2(u.vel.x,0.3);
+      b.rotation.y=Math.atan2(-u.vel.x,-0.3);
       // periodic minion spawns
       u.spawnAcc+=dt;
       if(u.spawnAcc>2.4){ u.spawnAcc=0; spawnBug(BOSSES[u.bossKey].spawns, { x:b.position.x, z:b.position.z }); }
@@ -943,7 +943,7 @@ function tick(nowMs){
       if(u.spec.aggressive){ const toC=new THREE.Vector3(-b.position.x,0,-b.position.z).normalize().multiplyScalar(u.vel.length()*0.4); u.vel.lerp(u.vel.clone().add(toC).setLength(u.vel.length()),0.05); }
       const step=slow*dt*60;
       b.position.x+=u.vel.x*step; b.position.z+=u.vel.z*step;
-      b.rotation.y=Math.atan2(u.vel.x,u.vel.z);
+      b.rotation.y=Math.atan2(-u.vel.x,-u.vel.z);
       if(u.spec.fly){ b.position.y=u.baseY+Math.sin(u.t)*0.35; u.wings.forEach((w,wi)=>{ w.rotation.z=(wi===0?1:-1)*(0.3+Math.sin(u.t*4)*0.9); }); }
       else { b.position.y=0.5+Math.abs(Math.sin(u.t))*0.06; u.legs.forEach(l=>{ l.mesh.rotation.x=0.3+Math.sin(u.t+l.phase)*0.4; }); }
       if(Math.abs(b.position.x)>13||b.position.z<-11||b.position.z>10) bugEscaped(b);

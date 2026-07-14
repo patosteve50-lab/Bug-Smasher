@@ -19,6 +19,7 @@
   // Detect whether a Devvit server is reachable. We assume "inside Reddit" if
   // a GET to the state endpoint returns JSON. Otherwise we go local-only.
   let online = false;
+  let currentUser = null;
 
   async function tryFetch(url, opts) {
     try {
@@ -34,9 +35,11 @@
 
   async function load() {
     const server = await tryFetch(API.load);
-    if (server && server.state) {
+    // A JSON response (even {state:null}) means we're inside Reddit / have a server.
+    if (server && typeof server === 'object' && 'state' in server) {
       online = true;
-      return server.state;
+      if (server.username) currentUser = server.username;
+      return server.state; // may be null for a brand-new user — that's fine
     }
     // fallback: localStorage
     online = false;
@@ -74,5 +77,5 @@
     return (await tryFetch(API.leaderboard)) || { entries: [] };
   }
 
-  window.BSData = { load, save, submitScore, leaderboard, get online() { return online; } };
+  window.BSData = { load, save, submitScore, leaderboard, username: () => currentUser, get online() { return online; } };
 })();
