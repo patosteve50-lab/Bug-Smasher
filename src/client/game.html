@@ -7,7 +7,8 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
   html,body { height:100%; overflow:hidden; background:#0a0e07; font-family:'Trebuchet MS','Segoe UI',sans-serif; touch-action:none; }
-  #game { display:block; width:100vw; height:100vh; cursor:crosshair; }
+  #game { display:block; width:100vw; height:100vh; cursor:crosshair; background:#0a0e07; }
+  body { background:#0a0e07; }
 
   .hud { position:fixed; inset:0; pointer-events:none; color:#eafce0; z-index:5; }
   .topbar { position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:flex-start; padding:16px 20px; }
@@ -78,24 +79,29 @@
   .hide { display:none !important; }
 
   @media (max-width:520px){
-    .overlay { gap:12px; padding:26px 16px; }
-    .title { font-size:clamp(38px,12vw,64px); line-height:1.04; }
-    .sub { font-size:11px; letter-spacing:.18em; line-height:1.9; max-width:90vw; }
-    .btn { padding:14px 34px; font-size:14px; }
-    .btn.sm { padding:11px 22px; font-size:11px; }
-    .modes { gap:10px; grid-template-columns:1fr 1fr; }
-    .mode { padding:14px 10px; }
-    .mode .mi { font-size:32px; }
-    .mode .mn { font-size:13px; }
-    .coinpill { font-size:14px; padding:7px 14px; }
+    .overlay { gap:8px; padding:16px 14px 28px; justify-content:flex-start; }
+    .sub { display:none; }
+    .logo-bug { font-size:34px; }
+    .title.stack .t1, .title.stack .t2 { font-size:clamp(34px,11vw,52px); }
+    .sub { font-size:10px; letter-spacing:.14em; line-height:1.7; max-width:92vw; margin:2px 0; }
+    .coinpill { font-size:13px; padding:6px 13px; }
+    .btn { padding:12px 30px; font-size:13px; }
+    .btn.sm { padding:10px 20px; font-size:11px; }
+    .modes { gap:8px; grid-template-columns:1fr 1fr; width:94vw; margin-top:2px; }
+    .mode { padding:10px 8px; border-radius:12px; }
+    .mode .mi { font-size:26px; }
+    .mode .mn { font-size:12px; margin-top:3px; }
+    .mode .md { font-size:8.5px; margin-top:2px; line-height:1.4; }
+    .mode .badge { font-size:8px; padding:3px 7px; top:-6px; right:-4px; }
+    .hint { font-size:9px; }
   }
 
-  .modes { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; width:min(640px,92vw); margin-top:4px; }
-  .mode { pointer-events:auto; cursor:pointer; padding:20px 16px; border-radius:16px; text-align:center;
+  .modes { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:min(420px,88vw); margin-top:4px; }
+  .mode { pointer-events:auto; cursor:pointer; padding:clamp(8px,2.5vw,14px) clamp(6px,2vw,12px); border-radius:14px; text-align:center;
     background:linear-gradient(160deg, rgba(30,50,18,.9), rgba(14,24,9,.9)); border:1px solid rgba(146,222,91,.3);
     transition:transform .12s, border-color .12s; position:relative; }
   .mode:hover { transform:translateY(-3px); border-color:#c9ff9e; }
-  .mode .mi { font-size:40px; }
+  .mode .mi { font-size:clamp(24px,6vw,34px); }
   .mode .mn { font-size:15px; font-weight:800; letter-spacing:.06em; margin-top:6px; color:#c9ff9e; }
   .mode .md { font-size:10px; letter-spacing:.1em; text-transform:uppercase; margin-top:5px; color:#9dc487; line-height:1.6; }
   .mode .badge { position:absolute; top:-8px; right:-8px; background:#ffd76a; color:#3a2a08; font-size:9px; font-weight:800;
@@ -160,7 +166,7 @@
 </style>
 </head>
 <body>
-<canvas id="game"></canvas>
+<canvas id="game" style="visibility:hidden"></canvas>
 <div id="flash"></div>
 <div id="toast"></div>
 <div class="fps hud hide" id="fps"></div>
@@ -192,7 +198,7 @@
 <!-- MENU -->
 <div class="overlay" id="menu">
   <div class="logo"><div class="logo-bug">🐞</div><h1 class="title stack"><span class="t1">BUG</span><span class="t2">SMASHER</span></h1></div>
-  <p class="sub">Tap the bugs before they escape. Chain combos, dodge friendly critters, beat the biome bosses.</p>
+  <p class="sub">Tap bugs before they escape. Combo, dodge friendlies, beat the bosses.</p>
   <div class="coinpill">✦ <span id="menuCoins">0</span> Shards</div>
   <div class="modes" id="modeGrid"></div>
   <div class="row">

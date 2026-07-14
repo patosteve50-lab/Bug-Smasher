@@ -839,7 +839,7 @@ function tick(nowMs){
   adaptQuality(dt);
 
   // hit-stop freezes gameplay briefly for impact
-  if(G.hitStop>0){ G.hitStop-=dt; updateBursts(dt); doCamera(dt); renderer.render(scene,camera); return; }
+  if(G.hitStop>0){ G.hitStop-=dt; updateBursts(dt); doCamera(dt); if(G.state==='play'||G.state==='over') renderer.render(scene,camera); return; }
 
   const slow=G.slowmo>0?0.45:1; 
   updateBursts(dt);
@@ -914,7 +914,12 @@ function tick(nowMs){
   }
 
   doCamera(dt);
-  renderer.render(scene,camera);
+  if(G.state==='play' || G.state==='over'){
+    canvas.style.visibility='visible';
+    renderer.render(scene,camera);
+  } else {
+    canvas.style.visibility='hidden';
+  }
 }
 
 function doCamera(dt){
