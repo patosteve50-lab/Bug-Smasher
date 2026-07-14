@@ -198,22 +198,32 @@ function shellMat(color){ if(!shellMatCache[color]) shellMatCache[color]=new THR
 
 // ---------- decor via InstancedMesh (perf) ----------
 let decorMesh=null;
+let decorMeshes=[];
 function buildDecor(cfg){
-  if(decorMesh){ scene.remove(decorMesh); decorMesh.geometry.dispose(); }
-  const N=26;
-  const geo = new THREE.DodecahedronGeometry(1,0);
-  const mat = new THREE.MeshStandardMaterial({ color:cfg.ground, roughness:1, flatShading:true });
-  decorMesh = new THREE.InstancedMesh(geo, mat, N);
-  decorMesh.castShadow=true; decorMesh.receiveShadow=true;
+  decorMeshes.forEach(d=>{ scene.remove(d); d.geometry.dispose(); }); decorMeshes=[];
+  if(decorMesh){ scene.remove(decorMesh); decorMesh=null; }
+  // base tone + a lighter and darker sibling so the field has tonal variety
+  const base=new THREE.Color(cfg.ground);
+  const tint=(mul)=>{ const c=base.clone(); const h={}; c.getHSL(h); c.setHSL(h.h,h.s,Math.min(0.85,Math.max(0.04,h.l*mul))); return c.getHex(); };
+  const families=[
+    { geo:new THREE.DodecahedronGeometry(1,0),      col:tint(1.0),  N:20, flat:true,  tall:[0.7,1.0] }, // angular rocks
+    { geo:new THREE.IcosahedronGeometry(0.9,0),     col:tint(1.35), N:12, flat:true,  tall:[0.5,0.8] }, // lighter smaller stones
+    { geo:new THREE.SphereGeometry(0.8,7,5),        col:tint(0.7),  N:8,  flat:false, tall:[0.6,0.9] }, // rounded dark mounds
+  ];
   const m=new THREE.Matrix4(), q=new THREE.Quaternion(), pos=new THREE.Vector3(), scl=new THREE.Vector3();
-  for(let i=0;i<N;i++){
-    const s=0.3+Math.random()*0.8;
-    pos.set((Math.random()-0.5)*30, s*0.4, (Math.random()-0.5)*26-4);
-    q.setFromEuler(new THREE.Euler(Math.random(),Math.random(),Math.random()));
-    scl.set(s,s*(0.7+Math.random()),s);
-    m.compose(pos,q,scl); decorMesh.setMatrixAt(i,m);
-  }
-  decorMesh.instanceMatrix.needsUpdate=true; scene.add(decorMesh);
+  families.forEach(f=>{
+    const mat=new THREE.MeshStandardMaterial({ color:f.col, roughness:1, metalness:0, flatShading:f.flat });
+    const dm=new THREE.InstancedMesh(f.geo, mat, f.N); dm.castShadow=true; dm.receiveShadow=true;
+    for(let i=0;i<f.N;i++){
+      const s=0.3+Math.random()*0.85;
+      const ty=f.tall[0]+Math.random()*(f.tall[1]-f.tall[0]);
+      pos.set((Math.random()-0.5)*32, s*0.4*ty, (Math.random()-0.5)*28-4);
+      q.setFromEuler(new THREE.Euler(Math.random(),Math.random(),Math.random()));
+      scl.set(s, s*ty, s);
+      m.compose(pos,q,scl); dm.setMatrixAt(i,m);
+    }
+    dm.instanceMatrix.needsUpdate=true; scene.add(dm); decorMeshes.push(dm);
+  });
 }
 
 // ---------- particle burst POOL (perf) ----------
@@ -252,7 +262,6 @@ function buildBugMesh(type){
   const spec=BUGS[type]; const g=new THREE.Group();
   const bm=bodyMat(spec.color), am=accMat(spec.accent);
   const abd=new THREE.Mesh(GEO.abd,bm); abd.scale.set(1,0.8,1.35); abd.position.z=0.25; g.add(abd);
-  const sm=shellMat(spec.color); const shell=new THREE.Mesh(GEO.shell,sm); shell.scale.set(0.9,0.55,1.12); shell.position.set(0,0.15,0.26); g.add(shell);
   const thx=new THREE.Mesh(GEO.thx,am); thx.position.z=-0.35; g.add(thx);
   const head=new THREE.Mesh(GEO.head,bm); head.position.z=-0.75; g.add(head);
   [-0.15,0.15].forEach(x=>{ const e=new THREE.Mesh(GEO.eye,eyeMat); e.position.set(x,0.12,-0.92); g.add(e);
